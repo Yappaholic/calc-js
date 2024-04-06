@@ -1,3 +1,6 @@
+const screen = document.querySelector(".screen");
+const text = document.createElement("p")
+text.classList.toggle("text")
 const number1 = document.querySelector("#one");
 const number2 = document.querySelector("#two");
 const number3 = document.querySelector("#three");
@@ -17,19 +20,57 @@ const buttonClear = document.querySelector("#c");
 let numbers = [number0, number1, number2, number3, number4, number5, number6, number7, number8, number9]
 let operators = [buttonDivide, buttonMultiply, buttonAdd, buttonSubstract]
 let res = []
+let regex = /\d+[*+-\/]\d+([*+-\/])/g;
+function textEdit(number) {
+  text.textContent += number;
+  screen.appendChild(text);
+};
+function easyEval(arr) {
+  let operateReg = /(\d+)([*+-\/])(\d+)/;
+  let easy = arr.join("");
+  easy = easy.match(operateReg);
+  firstNumber = (operate(easy[1], easy[2], easy[3]));
+  text.textContent = firstNumber;
+};
+function createEval(arr) {
+  let operateReg = /(\d+)([*+-\/])(\d+)/;
+  let evl = arr.join("");
+  let endResult
+  if (regex.test(evl) === true) {
+    let nextOperator = evl.match(/.$/)
+    evl = evl.replace(/.$/, "");
+    let result = evl.match(operateReg);
+    firstNumber = operate(result[1], result[2], result[3]);
+    text.textContent = firstNumber+nextOperator;
+    res = [firstNumber, nextOperator]
+  };
+};
+function numbersEvent(i) {
+  res.push(i);
+  textEdit(i);
+  createEval(res);
+};
+function operatorsEvent(i) {
+  res.push(i);
+  textEdit(i);
+  createEval(res);
+};
+function clear() {
+  res.length = 0
+  text.textContent = ""
+};
 for (let i = 0; i < 10; i++) {
-  numbers[i].addEventListener("click", () => res.push(i) && console.log(res))
-};
+  numbers[i].addEventListener("click", () => numbersEvent(i))};
 for (let i = 0; i < 4; i++) {
-  operators[i].addEventListener("click", () =>  res.push(operators[i].textContent) && console.log(res))
-};
-buttonClear.addEventListener("click", () => res.length = 0 && console.log(res));
-buttonEvaluate.addEventListener("click", () => console.log(res.join("")))
-function operate(string) {
-  let firstNumber
+  let operator = operators[i].textContent
+  operators[i].addEventListener("click", () => operatorsEvent(operator))};
+buttonClear.addEventListener("click", () => clear());
+buttonEvaluate.addEventListener("click", () => easyEval(res));
+function operate(...args) {
+  var firstNumber
   let operator
   let secondNumber
-  [firstNumber, operator, secondNumber] = string.split(" ")
+  [firstNumber, operator, secondNumber] = args
   firstNumber = Number(firstNumber)
   secondNumber = Number(secondNumber)
   if (operator == "+") {
